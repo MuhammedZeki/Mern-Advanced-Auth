@@ -1,3 +1,4 @@
+const { sendVerificationEmail } = require("../mail/mails");
 const User = require("../models/user.model");
 const { generateToken } = require("../token/jwt");
 const bcrypt = require("bcryptjs");
@@ -11,7 +12,10 @@ exports.register = async (req, res) => {
       if (!email) res.status(400).json({ message: "Email is required" });
       if (!name) res.status(400).json({ message: "Name is required" });
       if (!password) res.status(400).json({ message: "Password is required" });
-      if (password.length < 6) res.status(400).json({ message: "Min 6" });
+      if (password.length < 6)
+        res
+          .status(400)
+          .json({ message: "Password must be at least 6 characters" });
     }
     ValidateRegisterForm();
     const emailCheck = await User.findOne({ email });
@@ -28,6 +32,7 @@ exports.register = async (req, res) => {
     });
     await user.save();
     generateToken(user._id, res);
+    await sendVerificationEmail(user.email, verificationToken);
     const userObj = user.toObject();
     delete userObj.password;
     res.status(201).json({

@@ -1,10 +1,10 @@
 const { VERIFICATION_EMAIL_TEMPLATE } = require("./mailTemplates");
-const { sender, client } = require("./mailtrap.config");
+const { sender, mailtrapClient } = require("./mailtrap.config");
 
-exports.sendVerification = async (userEmail, verificationToken) => {
+exports.sendVerificationEmail = async (userEmail, verificationToken) => {
   try {
-    const recipients = [{ userEmail }];
-    const res = await client.send({
+    const recipients = [{ email: userEmail }];
+    const res = await mailtrapClient.send({
       from: sender,
       to: recipients,
       subject: "Verify your Email",
@@ -16,7 +16,7 @@ exports.sendVerification = async (userEmail, verificationToken) => {
     });
     console.log("Email sent successfully", res);
   } catch (error) {
-    console.error(`Error sending verification`, error);
-    throw new Error(`Error sending verification email: ${error}`);
+    console.error(`Error sending verification`, error.message);
+    throw new Error(`Error sending verification email: ${error.message}`);
   }
 };
