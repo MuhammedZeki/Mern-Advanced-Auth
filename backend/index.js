@@ -3,9 +3,12 @@ const app = express();
 const { config } = require("dotenv");
 const { connectDB } = require("./lib/db");
 const AuthRouter = require("./routes/auth.route");
+const cookieParser = require("cookie-parser");
 
 config();
 
+app.use(express.json());
+app.use(cookieParser());
 app.use("/auth", AuthRouter);
 
 const PORT = process.env.PORTC || "3000";
