@@ -7,8 +7,8 @@ const cookieParser = require("cookie-parser");
 
 config();
 
-app.use(express.json());
-app.use(cookieParser());
+app.use(express.json()); //for req.body
+app.use(cookieParser()); //for req.cookies
 app.use("/auth", AuthRouter);
 
 const PORT = process.env.PORTC || "3000";
