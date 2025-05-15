@@ -136,6 +136,8 @@ exports.resetPassword = async (req, res) => {
   const { password } = req.body;
   try {
     if (!password) res.status(400).json({ message: "Password is required!" });
+    if (password.length < 6)
+      res.status(400).json({ message: "Passsword must be at least 6 Char." });
     const _token = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpiresAt: { $gt: Date.now() },

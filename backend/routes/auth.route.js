@@ -6,11 +6,12 @@ const {
   verifyEmail,
   forgetPassword,
   resetPassword,
+  check,
 } = require("../controllers/auth.controllers");
 const { protectRoute } = require("../middleware/protectRoutes");
 const router = express.Router();
 
-router.get("/check", protectRoute);
+router.get("/check", protectRoute, check);
 router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", logout);
