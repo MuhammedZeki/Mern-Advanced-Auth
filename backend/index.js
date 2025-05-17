@@ -4,11 +4,18 @@ const { config } = require("dotenv");
 const { connectDB } = require("./lib/db");
 const AuthRouter = require("./routes/auth.route");
 const cookieParser = require("cookie-parser");
-
+const cors = require("cors");
 config();
 
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
 app.use(express.json()); //for req.body
 app.use(cookieParser()); //for req.cookies
+
 app.use("/auth", AuthRouter);
 
 const PORT = process.env.PORTC || "3000";

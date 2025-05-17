@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { User, Mail, Lock } from "lucide-react";
+import { User, Mail, Lock, Loader } from "lucide-react";
 import Input from "../components/Input.jsx";
 import { motion } from "framer-motion";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter.jsx";
+import toast from "react-hot-toast";
+import { useAuthStore } from "../store/useAuthStore.js";
+import { Link, useNavigate } from "react-router-dom";
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -10,12 +13,28 @@ const SignUpPage = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const { signUp, isLoading, error } = useAuthStore();
+  const navigate = useNavigate();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  const handleSubmit = (e) => {
+  function validateForm() {
+    if (!formData.fullName) return toast.error("Full Name is required");
+    if (!formData.email) return toast.error("Email is required");
+    if (!/\S+@\S+\.\S+/.test(formData.email))
+      return toast.error("Invalid email format");
+    if (!formData.password) return toast.error("Password is required");
+    if (formData.password.length < 6)
+      return toast.error("Password must be at least 6 characters");
+
+    return true;
+  }
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (validateForm()) {
+      if (await signUp(formData)) navigate("/verify-email");
+    }
   };
   return (
     <motion.div
@@ -57,8 +76,34 @@ const SignUpPage = () => {
             showPassword={showPassword}
             setShowPassword={setShowPassword}
           />
+
+          {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
           <PasswordStrengthMeter password={formData.password} />
+          <motion.button
+            className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
+						font-bold rounded-lg shadow-lg hover:from-green-600
+						hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+						 focus:ring-offset-gray-900 transition duration-200"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader className=" animate-spin mx-auto" size={24} />
+            ) : (
+              "Sign Up"
+            )}
+          </motion.button>
         </form>
+      </div>
+      <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
+        <p className="text-sm text-gray-400">
+          Already have an account?{" "}
+          <Link to={"/signin"} className="text-green-400 hover:underline">
+            Login
+          </Link>
+        </p>
       </div>
     </motion.div>
   );

@@ -2,16 +2,19 @@ import { useState } from "react";
 import { Mail, Lock, Loader } from "lucide-react";
 import { motion } from "framer-motion";
 import Input from "../components/Input";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 const SignInPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const { login, isLoading, error } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
-  const isLoading = false;
-  const handleSubmit = (e) => {
-    e.pereventDefault();
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (await login(formData)) navigate("/");
   };
   const handleChange = (e) => {
     const { value, name } = e.target;
@@ -57,6 +60,8 @@ const SignInPage = () => {
               Forgot password?
             </Link>
           </div>
+          {error && <p className="text-red-500 font-semibold mb-2">{error}</p>}
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -71,15 +76,14 @@ const SignInPage = () => {
             )}
           </motion.button>
         </form>
-
-        <div className="px-8 py-4 mt-2 rounded-sm bg-gray-900 bg-opacity-50 flex justify-center">
-          <p className="text-sm text-gray-400">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-green-400 hover:underline">
-              Sign up
-            </Link>
-          </p>
-        </div>
+      </div>
+      <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center !border-red-600">
+        <p className="text-sm text-gray-400">
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-green-400 hover:underline">
+            Sign up
+          </Link>
+        </p>
       </div>
     </motion.div>
   );
